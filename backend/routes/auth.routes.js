@@ -5,4 +5,4 @@ authrouter.post("/signup", signUp);
 authrouter.post("/signin", signIn);
 authrouter.get("/signout", signOut);
 
-export default authrouter
+export default authrouter;

@@ -4,7 +4,7 @@ import genToken from "../utils/token.js";
 export const signUp = async (req, res) => {
   try {
     const { fullName, email, password, mobile, role } = req.body;
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exist" });
     }
@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
     const token = await genToken(user._id);
     res.cookie("token", token, {
       secure: false,
-      sameSite: strict,
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
@@ -57,7 +57,7 @@ export const signIn = async (req, res) => {
     const token = await genToken(user._id);
     res.cookie("token", token, {
       secure: false,
-      sameSite: strict,
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
