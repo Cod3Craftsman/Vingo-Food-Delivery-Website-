@@ -5,6 +5,9 @@ import { sendOtpMail } from "../utils/mail.js";
 export const signUp = async (req, res) => {
   try {
     const { fullName, email, password, mobile, role } = req.body;
+    if (!fullName || !email || !password || !mobile || !role) {
+      return res.status(400).json({message : "All fields are required"});
+    }
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exist" });
@@ -14,7 +17,7 @@ export const signUp = async (req, res) => {
         .status(400)
         .json({ message: "Password must be at least 6 characters." });
     }
-    if (mobile.length < 10) {
+    if (mobile.length < 10 || mobile.length > 10) {
       return res
         .status(400)
         .json({ message: "Mobile number must be of 10 digits." });
@@ -45,9 +48,21 @@ export const signUp = async (req, res) => {
 export const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if(email === ""){
+      return res.status(400).json({message : "Please enter your email"})
+    }
+    if(password === "")
+    {
+      return res.status(400).json({message : "Please enter your password"})
+    }
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
+    }
+
+    if(password.length < 6){
+      return res.status(400).json({message : "Password must be 6 characters long"})
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -81,6 +96,9 @@ export const signOut = async (req, res) => {
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
+    if(email === ""){
+      return res.status(400).json({message : "Please enter your email"})
+    }
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist." });
@@ -110,7 +128,7 @@ export const verifyOtp = async (req, res) => {
     await user.save();
     return res.status(200).json({ message: "OTP verified successfully!" });
   } catch (error) {
-    return res.status(400).json(`Error in verifying OTP ${error}`);
+    return res.status(500).json(`Error in verifying OTP ${error}`);
   }
 };
 
@@ -129,7 +147,32 @@ export const resetPassword = async (req, res) => {
       .status(200)
       .json({ message: "Your password has been reset successfully." });
   } catch (error) {
-    return res.status(400).json(`Error in resetting your password. ${error}`);
+    return res.status(500).json(`Error in resetting your password. ${error}`);
+  }
+};
 
+export const googleAuth = async (req, res) => {
+  try {
+    const { fullName, email, mobile, role } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) {
+      //signup
+      user = await User.create({
+        fullName,
+        email,
+        mobile,
+        role: role || "user",
+      });
+    }
+    const token = await genToken(user._id);
+    res.cookie("token", token, {
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json(`googleAuth error. ${error}`);
   }
 };
