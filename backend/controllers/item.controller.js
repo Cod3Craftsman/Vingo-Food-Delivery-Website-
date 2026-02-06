@@ -23,10 +23,13 @@ export const addItem = async (req, res) => {
       image,
       shop: shop._id,
     });
-    return res.status(201).json(item);
+    shop.items.push(item._id)
+    await shop.save();
+    await shop.populate("items owner")
+    return res.status(201).json(shop);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Error in adding item" });
+    return res.status(500).json({ message: `Error in adding item ${error}` });
   }
 };
 
@@ -44,13 +47,29 @@ export const editItem = async (req, res) => {
     const item = await Item.findByIdAndUpdate(
       itemId,
       { name, category, foodType, price, image },
-      { new: true }
+      { new: true },
     );
-    if(!item){
-      return res.status(400).json({message : "Itme not found"})
+    if (!item) {
+      return res.status(400).json({ message: "Item not found" });
     }
+    const shop = await Shop.findOne({owner : req.userId}).populate("items")
+    return res.status(200).json(shop)
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ message: "Error in editing item" });
   }
 };
+
+
+export const getItemById = async (req , res) => {
+    try {
+      const itemId = req.params.itemId;
+      const item = await Item.findById(itemId);
+      if(!item){
+        return res.status(500).json({message : `Item not found`})
+      }
+      return res.json(item)
+    } catch (error) {
+        return res.status(500).json({message : `getItemById error ${error}`})
+    }
+}

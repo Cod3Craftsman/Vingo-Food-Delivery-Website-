@@ -3,6 +3,7 @@ import Nav from "../components/Nav"
 import { FaUtensils } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 import { FaPen } from "react-icons/fa"
+import OwnerItemCard from "./OwnerItemCard"
 function OwnerDashboard() {
   const navigate = useNavigate()
   const { myShopData } = useSelector(state => state.owner)
@@ -51,6 +52,15 @@ function OwnerDashboard() {
                   <button className="bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200 cursor-pointer" onClick={() => navigate("/add-item")}>Add New Item</button>
                 </div>
               </div>
+            </div>
+          }
+
+
+          {myShopData.items.length > 0 && 
+            <div className="flex flex-col items-center gap-4 w-full max-w-3xl">
+              {myShopData.items.map((item , index) =>(
+                <OwnerItemCard data={item} key={index}/>
+              ))}
             </div>
           }
 
