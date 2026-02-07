@@ -7,6 +7,7 @@ import OwnerItemCard from "./OwnerItemCard"
 function OwnerDashboard() {
   const navigate = useNavigate()
   const { myShopData } = useSelector(state => state.owner)
+
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center">
       <Nav />
@@ -26,7 +27,7 @@ function OwnerDashboard() {
       {myShopData &&
         <div className="w-full flex flex-col items-center gap-6 px-4 sm:px-6">
           <h1 className="text-2xl sm:text-3xl text-gray-900 flex items-center gap-3 mt-8 text-center">
-            <FaUtensils className="text-[#ff4d2d] w-14 h-14" />Welcome to {myShopData.name}</h1>
+            <FaUtensils className="text-[#ff4d2d] w-14 h-14" />Welcome to {myShopData.name}'s restaurant</h1>
 
           <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-orange-100 hover:shadow-2xl transition-all duration-300 w-full max-w-3xl relative">
             <div className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full shadow-md hover:bg-orange-600 transition-colors cursor-pointer" onClick={() => navigate("/create-edit-shop")}>

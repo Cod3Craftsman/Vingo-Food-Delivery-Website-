@@ -9,7 +9,7 @@ export const createEditShop = async (req, res) => {
     }
     let image;
     if (req.file) {
-      console.log(req.file)
+      console.log(req.file);
       image = await uploadOnCloudinary(req.file.path);
     }
     let shop = await Shop.findOne({ owner: req.userId });
@@ -33,7 +33,7 @@ export const createEditShop = async (req, res) => {
           image,
           owner: req.userId,
         },
-        { new: true }
+        { new: true },
       );
     }
     await shop.populate("owner items");
@@ -46,12 +46,16 @@ export const createEditShop = async (req, res) => {
 
 export const getMyShop = async (req, res) => {
   try {
-    const shop = await Shop.findOne({ owner: req.userId }).populate("owner items")
+    const shop = await Shop.findOne({ owner: req.userId })
+      .populate("owner")
+      .populate({
+        path: "items",
+        options: { sort: { updatedAt: -1 } },
+      });
     if (!shop) {
       return null;
     }
     return res.status(200).json(shop);
-
   } catch (error) {
     return res.status(500).json({ message: "Error in getting your shop." });
   }
